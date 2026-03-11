@@ -8,7 +8,7 @@ export async function updateAvatar(req, res, next) {
             const avatar = await resizeImg(req.file);
             const user = await changeAvatar(req.user.id, avatar);
             return res.status(200).json({
-                avatarURL: user.avatarURL,
+                avatar: user.avatar,
             });
         }
         return res.status(401).json({

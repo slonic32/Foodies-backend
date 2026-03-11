@@ -4,8 +4,13 @@ import cors from 'cors';
 import 'dotenv/config';
 import { connectDatabase } from './db/connectDatabase.js';
 
+import { globalErrorHandler } from './helpers/globalErrorHandler.js';
+
 import authRouter from './routes/authRouter.js';
 import usersRouter from './routes/usersRouter.js';
+
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './helpers/swagger.js';
 
 try {
     await connectDatabase();
@@ -17,12 +22,18 @@ try {
 
 const app = express();
 
+// base path
+const pathPrefix = '/api';
+
 app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth', authRouter);
-app.use('/api/users', usersRouter);
+// path for API documentation
+app.use(`${pathPrefix}/docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(`${pathPrefix}/auth`, authRouter);
+app.use(`${pathPrefix}/users`, usersRouter);
 
 app.use(express.static('public'));
 
@@ -30,10 +41,7 @@ app.use((_, res) => {
     res.status(404).json({ message: 'Route not found' });
 });
 
-app.use((err, req, res, next) => {
-    const { status = 500, message = 'Server error' } = err;
-    res.status(status).json({ message });
-});
+app.use(globalErrorHandler);
 
 app.listen(process.env.PORT, () => {
     console.log('Server is running. Use our API on port: ', process.env.PORT);

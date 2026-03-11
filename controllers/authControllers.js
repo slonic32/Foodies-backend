@@ -8,18 +8,18 @@ import {
 
 export async function registerUser(req, res, next) {
     try {
-        const { email, password } = req.body;
+        const { name, email, password } = req.body;
         if (await getUserByEmail(email)) {
             return res.status(409).json({
                 message: 'Email in use',
             });
         }
-        const newUser = await createUser(email, password);
+        const newUser = await createUser(name, email, password);
 
         return res.status(201).json({
+            name: newUser.name,
             email: newUser.email,
-            subscription: newUser.subscription,
-            avatarURL: newUser.avatarURL,
+            avatar: newUser.avatar,
         });
     } catch (error) {
         next(error);
@@ -33,9 +33,9 @@ export async function loginUser(req, res, next) {
         res.status(200).json({
             token: user.token,
             user: {
+                name: user.name,
                 email: user.email,
-                subscription: user.subscription,
-                avatarURL: user.avatarURL,
+                avatar: user.avatar,
             },
         });
     } catch (error) {
@@ -57,9 +57,9 @@ export async function currentUser(req, res, next) {
     try {
         const user = await getUserById(req.user.id);
         res.status(200).json({
+            name: user.name,
             email: user.email,
-            subscription: user.subscription,
-            avatarURL: user.avatarURL,
+            avatar: user.avatar,
         });
     } catch (error) {
         next(error);

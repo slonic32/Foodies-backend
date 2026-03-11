@@ -17,14 +17,15 @@ export async function getUserByEmail(userEmail) {
     }
 }
 
-export async function createUser(userEmail, userPassword) {
+export async function createUser(userName, userEmail, userPassword) {
     try {
         const avatar = gravatar.url(userEmail, { s: '250' }, false);
 
         const newUser = await User.create({
+            name: userName,
             email: userEmail,
-            password: hashPassword,
-            avatarURL: avatar,
+            password: userPassword,
+            avatar: avatar,
         });
         return newUser;
     } catch (error) {
