@@ -12,14 +12,6 @@ import usersRouter from './routes/usersRouter.js';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './helpers/swagger.js';
 
-try {
-    await connectDatabase();
-    console.log('Database connection successful');
-} catch (error) {
-    console.log(error.message);
-    process.exit(1);
-}
-
 const app = express();
 
 // base path
@@ -47,3 +39,11 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log('Server is running. Use our API on port: ', port);
 });
+
+try {
+    await connectDatabase();
+    console.log('Database connection successful');
+} catch (error) {
+    console.log(error.message);
+    process.exit(1);
+}
