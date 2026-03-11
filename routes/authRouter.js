@@ -16,6 +16,12 @@ authRouter.get('/current', auth, currentUser);
 
 export default authRouter;
 
+/*
+========================================
+Swagger docs
+========================================
+*/
+
 /**
  * @swagger
  * /api/auth/register:
@@ -64,10 +70,7 @@ export default authRouter;
  *                   example: null
  *       409:
  *         description: Email in use
- */
-
-/**
- * @swagger
+ *
  * /api/auth/login:
  *   post:
  *     summary: Login user
@@ -116,10 +119,7 @@ export default authRouter;
  *                       example: null
  *       401:
  *         description: Email or password is wrong
- */
-
-/**
- * @swagger
+ *
  * /api/auth/logout:
  *   post:
  *     summary: Logout current user
@@ -131,10 +131,7 @@ export default authRouter;
  *         description: User successfully logged out
  *       401:
  *         description: Not authorized
- */
-
-/**
- * @swagger
+ *
  * /api/auth/current:
  *   get:
  *     summary: Get current user

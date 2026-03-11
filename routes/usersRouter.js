@@ -10,6 +10,12 @@ usersRouter.patch('/avatar', auth, uploadImage, updateAvatar);
 
 export default usersRouter;
 
+/*
+========================================
+Swagger docs
+========================================
+*/
+
 /**
  * @swagger
  * /api/users/avatar:
