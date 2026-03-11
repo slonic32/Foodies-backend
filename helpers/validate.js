@@ -6,3 +6,12 @@ export function validate(schema, body) {
         throw HttpError(400, error.details.map((err) => err.message).join(' ; '));
     }
 }
+
+export function validateID(contactId) {
+    // only  integers
+    if (!/^[1-9]\d*$/.test(String(contactId))) {
+        return false;
+    }
+
+    return true;
+}

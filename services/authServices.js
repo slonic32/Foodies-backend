@@ -1,4 +1,4 @@
-import { User } from '../models/usersModel.js';
+import { User } from '../db/models/usersModel.js';
 import HttpError from '../helpers/HttpError.js';
 
 import { genToken } from './jwtServices.js';

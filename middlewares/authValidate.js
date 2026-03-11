@@ -1,5 +1,5 @@
 import { validate } from '../helpers/validate.js';
-import { registerSchema, verificationSchema } from '../schemas/userSchemas.js';
+import { registerSchema } from '../schemas/userSchemas.js';
 
 export async function authValidate(req, res, next) {
     try {

@@ -4,6 +4,8 @@
   "description": "Final Project team 04",
   "main": "eslint.config.js",
   "scripts": {
+    "start": "node ./app.js",
+    "dev": "nodemon ./app.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -28,6 +30,7 @@
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.4.0",
+    "nodemon": "^3.1.14",
     "prettier": "^3.8.1",
     "url": "^0.11.4"
   },
@@ -39,7 +42,7 @@
     "fs-extra": "^11.3.4",
     "fse": "^4.0.1",
     "gravatar": "^1.8.2",
-    "jimp": "^1.6.0",
+    "jimp": "^0.22.12",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
