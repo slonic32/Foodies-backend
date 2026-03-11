@@ -2,7 +2,7 @@
   "name": "foodies-backend",
   "version": "1.0.0",
   "description": "Final Project team 04",
-  "main": "eslint.config.js",
+  "main": "app.js",
   "scripts": {
     "start": "node ./app.js",
     "dev": "nodemon ./app.js",
