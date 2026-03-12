@@ -9,6 +9,8 @@ import { globalErrorHandler } from './helpers/globalErrorHandler.js';
 import authRouter from './routes/authRouter.js';
 import usersRouter from './routes/usersRouter.js';
 
+import recipesRouter from './routes/recipesRouter.js';
+
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './helpers/swagger.js';
 
@@ -34,6 +36,8 @@ app.use(`${pathPrefix}/docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(`${pathPrefix}/auth`, authRouter);
 app.use(`${pathPrefix}/users`, usersRouter);
+
+app.use(`${pathPrefix}/recipes`, recipesRouter);
 
 app.use(express.static('public'));
 
