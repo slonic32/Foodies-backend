@@ -10,7 +10,7 @@ authRouter.post('/register', validateBody(registerSchema), registerUser);
 
 authRouter.post('/login', validateBody(loginSchema), loginUser);
 
-authRouter.post('/logout', auth, logoutUser);
+authRouter.get('/logout', auth, logoutUser);
 
 authRouter.get('/current', auth, currentUser);
 
@@ -121,7 +121,7 @@ Swagger docs
  *         description: Email or password is wrong
  *
  * /api/auth/logout:
- *   post:
+ *   get:
  *     summary: Logout current user
  *     tags: [Auth API]
  *     security:
