@@ -1,5 +1,5 @@
 import express from 'express';
-import { updateAvatar } from '../controllers/usersControllers.js';
+import { updateAvatar, currentUser } from '../controllers/usersControllers.js';
 import { auth } from '../middlewares/authMiddleware.js';
 
 import { uploadImage } from '../middlewares/imgMiddleware.js';
@@ -7,6 +7,9 @@ import { uploadImage } from '../middlewares/imgMiddleware.js';
 const usersRouter = express.Router();
 
 usersRouter.patch('/avatar', auth, uploadImage, updateAvatar);
+
+// get current user
+usersRouter.get('/current', auth, currentUser);
 
 export default usersRouter;
 
