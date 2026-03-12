@@ -11,6 +11,7 @@ import usersRouter from './routes/usersRouter.js';
 
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './helpers/swagger.js';
+import testimonialsRouter from './routes/testimonialsRouter.js';
 
 try {
     await connectDatabase();
@@ -36,6 +37,8 @@ app.use(`${pathPrefix}/auth`, authRouter);
 app.use(`${pathPrefix}/users`, usersRouter);
 
 app.use(express.static('public'));
+
+app.use('/api/testimonials', testimonialsRouter);
 
 app.use((_, res) => {
     res.status(404).json({ message: 'Route not found' });
