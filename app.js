@@ -4,14 +4,23 @@ import cors from 'cors';
 import 'dotenv/config';
 import { connectDatabase } from './db/connectDatabase.js';
 
+
+
 import { globalErrorHandler } from './helpers/globalErrorHandler.js';
 
 import authRouter from './routes/authRouter.js';
 import usersRouter from './routes/usersRouter.js';
+
 import ingredientsRouter from './routes/ingredientsRouter.js';
+
+import categoriesRouter from './routes/categoriesRouter.js';
+
+import recipesRouter from './routes/recipesRouter.js';
+
 
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './helpers/swagger.js';
+import testimonialsRouter from './routes/testimonialsRouter.js';
 
 try {
     await connectDatabase();
@@ -37,7 +46,12 @@ app.use(`${pathPrefix}/auth`, authRouter);
 app.use(`${pathPrefix}/users`, usersRouter);
 app.use(`${pathPrefix}/ingredients`, ingredientsRouter);
 
+app.use(`${pathPrefix}/recipes`, recipesRouter);
+
 app.use(express.static('public'));
+
+app.use('/api/testimonials', testimonialsRouter);
+app.use('/api/categories', categoriesRouter);
 
 app.use((_, res) => {
     res.status(404).json({ message: 'Route not found' });

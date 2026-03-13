@@ -1,5 +1,10 @@
 import express from 'express';
-import { updateAvatar } from '../controllers/usersControllers.js';
+import {
+    updateAvatar, currentUser, getFollowers,
+    getFollowing,
+    followUser,
+    unfollowUser
+} from '../controllers/usersControllers.js';
 import { auth } from '../middlewares/authMiddleware.js';
 
 import { uploadImage } from '../middlewares/imgMiddleware.js';
@@ -7,6 +12,16 @@ import { uploadImage } from '../middlewares/imgMiddleware.js';
 const usersRouter = express.Router();
 
 usersRouter.patch('/avatar', auth, uploadImage, updateAvatar);
+
+// get current user
+usersRouter.get('/current', auth, currentUser);
+
+
+usersRouter.get('/followers', auth, getFollowers);
+usersRouter.get('/following', auth, getFollowing);
+
+usersRouter.post('/follow/:id', auth, followUser);
+usersRouter.delete('/follow/:id', auth, unfollowUser);
 
 export default usersRouter;
 
