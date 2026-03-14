@@ -11,6 +11,7 @@ recipesRouter.get('/', validateBody(searchRecipesSchema, 'query'), recipeControl
 recipesRouter.get('/popular', recipeController.getPopular);
 
 recipesRouter.get('/own', auth, recipeController.getOwn);
+recipesRouter.get('/favorites', auth, recipeController.getFavorites);
 
 recipesRouter.get('/:id', recipeController.getById);
 
@@ -232,6 +233,54 @@ Swagger docs
  *     responses:
  *       200:
  *         description: Paginated list of own recipes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     recipes:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/RecipeSummary'
+ *                     meta:
+ *                       $ref: '#/components/schemas/Meta'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * @swagger
+ * /api/recipes/favorites:
+ *   get:
+ *     summary: Get favorite recipes of the authenticated user
+ *     description: >
+ *       Returns paginated list of recipes added to user's favorites.
+ *       Returns empty array with 200 if favorites list is empty.
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 50
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Paginated list of favorite recipes
  *         content:
  *           application/json:
  *             schema:

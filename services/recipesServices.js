@@ -109,6 +109,39 @@ export const getUserRecipes = async ({ owner_id, page, limit }) => {
         },
     };
 };
+
+export const getUserFavoriteRecipes = async ({ user_id, page, limit }) => {
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Recipe.findAndCountAll({
+        include: [
+            {
+                model: Favorite,
+                as: 'favorites',
+                attributes: [],
+                where: { user_id },
+                required: true,
+            },
+            { model: Category, as: 'category', attributes: ['id', 'name'] },
+            { model: Area, as: 'area', attributes: ['id', 'name'] },
+        ],
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
+        distinct: true,
+    });
+
+    return {
+        recipes: rows,
+        meta: {
+            total: count,
+            page,
+            limit,
+            totalPages: Math.ceil(count / limit),
+        },
+    };
+};
+
 export const createRecipe = async (userId, data) => {
     return await Recipe.create({ ...data, owner_id: userId });
 };
