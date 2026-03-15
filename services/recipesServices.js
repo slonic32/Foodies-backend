@@ -154,17 +154,6 @@ export const addRecipeToFavorites = async (userId, recipeId) => {
         throw HttpError(404, 'Recipe not found');
     }
 
-    const existingFavorite = await Favorite.findOne({
-        where: {
-            user_id: userId,
-            recipe_id: recipeId,
-        },
-    });
-
-    if (existingFavorite) {
-        throw HttpError(409, 'Recipe is already in favorites');
-    }
-
     try {
         return await Favorite.create({
             user_id: userId,
