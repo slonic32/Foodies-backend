@@ -33,15 +33,6 @@ export async function createUser(userName, userEmail, userPassword) {
     }
 }
 
-export async function getUserById(id) {
-    try {
-        const user = await User.findByPk(id);
-        return user;
-    } catch (error) {
-        throw HttpError(500);
-    }
-}
-
 export async function loginUserService({ email, password }) {
     const user = await getUserByEmail(email);
 

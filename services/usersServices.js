@@ -1,16 +1,62 @@
 import HttpError from '../helpers/HttpError.js';
 import { User } from '../db/models/usersModel.js';
 import { Subscription } from '../db/models/subscriptionsModel.js';
+import { Recipe } from '../db/models/recipesModel.js';
+import { Favorite } from '../db/models/favoritesModel.js';
 
-import { getUserById } from './authServices.js';
 
 export async function changeAvatar(id, avatar) {
     try {
-        const user = await getUserById(id);
+        const user = await User.findByPk(id);
+        if (!user) throw HttpError(404, "User not found");
+
         await user.update({ avatar: avatar });
         return user;
     } catch (error) {
+        if (error.status) throw error;
+        throw HttpError(500, "Error updating avatar");
+    }
+}
+
+export async function getUserById(id) {
+    try {
+        const user = await User.findByPk(id);
+        return user;
+    } catch (error) {
+        console.error("Database error in getUserById:", error);
         throw HttpError(500);
+    }
+}
+
+export async function fetchCurrentUserInfo(userId) {
+    try {
+        const user = await User.findByPk(userId, {
+            attributes: ['id', 'name', 'email', 'avatar'],
+        });
+
+        if (!user) {
+            throw HttpError(404, "User not found");
+        }
+
+        const [recipesCount, favoritesCount, followersCount, followingCount] = await Promise.all([
+            Recipe.count({ where: { owner_id: userId } }),
+            Favorite.count({ where: { user_id: userId } }),
+            Subscription.count({ where: { following_id: userId } }),
+            Subscription.count({ where: { follower_id: userId } })
+        ]);
+
+        return {
+            avatar: user.avatar,
+            name: user.name,
+            email: user.email,
+            recipesCount,
+            favoritesCount,
+            followersCount,
+            followingCount
+        }
+    } catch (error) {
+        if (error.status) throw error;
+        throw HttpError(500, "Error fetching current user");
     }
 }
 

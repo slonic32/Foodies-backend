@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-    updateAvatar, currentUser, getFollowers,
+    updateAvatar, getCurrentUserInfo, getFollowers,
     getFollowing,
     followUser,
     unfollowUser
@@ -14,8 +14,7 @@ const usersRouter = express.Router();
 usersRouter.patch('/avatar', auth, uploadImage, updateAvatar);
 
 // get current user
-usersRouter.get('/current', auth, currentUser);
-
+usersRouter.get('/current', auth, getCurrentUserInfo);
 
 usersRouter.get('/followers', auth, getFollowers);
 usersRouter.get('/following', auth, getFollowing);

@@ -1,5 +1,5 @@
 import express from 'express';
-import { currentUser, loginUser, logoutUser, registerUser } from '../controllers/authControllers.js';
+import { loginUser, logoutUser, registerUser } from '../controllers/authControllers.js';
 import { auth } from '../middlewares/authMiddleware.js';
 import { registerSchema, loginSchema } from '../schemas/userSchemas.js';
 import { validateBody } from '../middlewares/validateBody.js';
@@ -11,8 +11,6 @@ authRouter.post('/register', validateBody(registerSchema), registerUser);
 authRouter.post('/login', validateBody(loginSchema), loginUser);
 
 authRouter.get('/logout', auth, logoutUser);
-
-authRouter.get('/current', auth, currentUser);
 
 export default authRouter;
 

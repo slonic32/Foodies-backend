@@ -2,12 +2,11 @@ import {
     changeAvatar, addFollower,
     removeFollower,
     getUserFollowers,
-    getUserFollowing
+    getUserFollowing,
+    fetchCurrentUserInfo
 } from '../services/usersServices.js';
 
 import { resizeImg } from '../services/imgServices.js';
-
-import { getUserById } from '../services/authServices.js';
 
 
 
@@ -28,19 +27,15 @@ export async function updateAvatar(req, res, next) {
     }
 }
 
-export async function currentUser(req, res, next) {
+export async function getCurrentUserInfo(req, res, next) {
     try {
-        const user = await getUserById(req.user.id);
-        res.status(200).json({
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar,
-        });
+        const userInfo = await fetchCurrentUserInfo(req.user.id);
+
+        res.status(200).json(userInfo);
     } catch (error) {
         next(error);
     }
 }
-
 
 export async function followUser(req, res, next) {
     try {
@@ -91,3 +86,5 @@ export async function getFollowing(req, res, next) {
         next(error);
     }
 }
+
+
