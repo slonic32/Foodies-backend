@@ -1,6 +1,6 @@
 import { validateID } from '../helpers/validate.js';
-import { getUserById } from '../services/authServices.js';
 import { readToken } from '../services/jwtServices.js';
+import { getUserById } from '../services/usersServices.js';
 
 export async function auth(req, res, next) {
     try {
@@ -17,7 +17,7 @@ export async function auth(req, res, next) {
         const token = req.headers.authorization.split(' ')[1];
         if (!token) {
             return res.status(401).json({
-                message: 'Not authorized',
+                message: 'Not authorized asdas das',
             });
         }
         const id = readToken(token);

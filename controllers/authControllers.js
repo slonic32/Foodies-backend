@@ -1,7 +1,6 @@
 import {
     createUser,
     getUserByEmail,
-    getUserById,
     loginUserService,
     logoutUserService,
 } from '../services/authServices.js';
@@ -48,19 +47,6 @@ export async function logoutUser(req, res, next) {
         const userId = req.user.id;
         await logoutUserService(userId);
         res.status(204).send();
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function currentUser(req, res, next) {
-    try {
-        const user = await getUserById(req.user.id);
-        res.status(200).json({
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar,
-        });
     } catch (error) {
         next(error);
     }
