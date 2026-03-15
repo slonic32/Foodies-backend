@@ -6,6 +6,7 @@ import { Category } from '../db/models/categoriesModel.js';
 import { Area } from '../db/models/areasModel.js';
 import { RecipeIngredient } from '../db/models/recipeIngredientsModel.js';
 import HttpError from '../helpers/HttpError.js';
+import { UniqueConstraintError } from 'sequelize';
 
 export const listRecipes = async ({ category, area, ingredient, page = 1, limit = 10 }) => {
     const offset = (page - 1) * limit;
@@ -109,8 +110,82 @@ export const getUserRecipes = async ({ owner_id, page, limit }) => {
         },
     };
 };
+
+export const getUserFavoriteRecipes = async ({ user_id, page, limit }) => {
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Recipe.findAndCountAll({
+        include: [
+            {
+                model: Favorite,
+                as: 'favorites',
+                attributes: [],
+                where: { user_id },
+                required: true,
+            },
+            { model: Category, as: 'category', attributes: ['id', 'name'] },
+            { model: Area, as: 'area', attributes: ['id', 'name'] },
+        ],
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
+        distinct: true,
+    });
+
+    return {
+        recipes: rows,
+        meta: {
+            total: count,
+            page,
+            limit,
+            totalPages: Math.ceil(count / limit),
+        },
+    };
+};
+
 export const createRecipe = async (userId, data) => {
     return await Recipe.create({ ...data, owner_id: userId });
+};
+
+export const addRecipeToFavorites = async (userId, recipeId) => {
+    const recipe = await Recipe.findByPk(recipeId);
+
+    if (!recipe) {
+        throw HttpError(404, 'Recipe not found');
+    }
+
+    try {
+        return await Favorite.create({
+            user_id: userId,
+            recipe_id: recipeId,
+        });
+    } catch (error) {
+        if (error instanceof UniqueConstraintError) {
+            throw HttpError(409, 'Recipe is already in favorites');
+        }
+        throw error;
+    }
+};
+
+export const removeRecipeFromFavorites = async (userId, recipeId) => {
+    const recipe = await Recipe.findByPk(recipeId);
+
+    if (!recipe) {
+        throw HttpError(404, 'Recipe not found');
+    }
+
+    const deletedCount = await Favorite.destroy({
+        where: {
+            user_id: userId,
+            recipe_id: recipeId,
+        },
+    });
+
+    if (!deletedCount) {
+        throw HttpError(404, 'Recipe is not in favorites');
+    }
+
+    return true;
 };
 
 export const deleteRecipe = async (userId, recipeId) => {

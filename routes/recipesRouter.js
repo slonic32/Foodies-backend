@@ -11,10 +11,13 @@ recipesRouter.get('/', validateBody(searchRecipesSchema, 'query'), recipeControl
 recipesRouter.get('/popular', recipeController.getPopular);
 
 recipesRouter.get('/own', auth, recipeController.getOwn);
+recipesRouter.get('/favorites', auth, recipeController.getFavorites);
 
 recipesRouter.get('/:id', recipeController.getById);
 
 recipesRouter.post('/', auth, validateBody(createRecipeSchema), recipeController.create);
+recipesRouter.post('/:id/favorite', auth, recipeController.addToFavorites);
+recipesRouter.delete('/:id/favorite', auth, recipeController.removeFromFavorites);
 
 recipesRouter.delete('/:id', auth, recipeController.remove);
 
@@ -77,6 +80,17 @@ Swagger docs
  *               message:
  *                 type: string
  *                 example: "category must be a number"
+ *
+ *     Conflict:
+ *       description: Resource conflict
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 example: Recipe is already in favorites
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -241,6 +255,54 @@ Swagger docs
 
 /**
  * @swagger
+ * /api/recipes/favorites:
+ *   get:
+ *     summary: Get favorite recipes of the authenticated user
+ *     description: >
+ *       Returns paginated list of recipes added to user's favorites.
+ *       Returns empty array with 200 if favorites list is empty.
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 50
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Paginated list of favorite recipes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     recipes:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/RecipeSummary'
+ *                     meta:
+ *                       $ref: '#/components/schemas/Meta'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * @swagger
  * /api/recipes/{id}:
  *   get:
  *     summary: Get recipe detail by ID
@@ -312,6 +374,85 @@ Swagger docs
  *         $ref: '#/components/responses/BadRequest'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * @swagger
+ * /api/recipes/{id}/favorite:
+ *   post:
+ *     summary: Add recipe to authenticated user's favorites
+ *     description: >
+ *       Creates a favorite relation between current user and recipe.
+ *       Returns 409 if recipe is already in favorites.
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Recipe integer ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       201:
+ *         description: Recipe successfully added to favorites
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 11
+ *                     user_id:
+ *                       type: integer
+ *                       example: 3
+ *                     recipe_id:
+ *                       type: integer
+ *                       example: 1
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       409:
+ *         $ref: '#/components/responses/Conflict'
+ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * @swagger
+ * /api/recipes/{id}/favorite:
+ *   delete:
+ *     summary: Remove recipe from authenticated user's favorites
+ *     description: >
+ *       Removes a favorite relation between current user and recipe.
+ *       Returns 404 if recipe does not exist or is not in favorites.
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Recipe integer ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       204:
+ *         description: Recipe successfully removed from favorites (no content)
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
