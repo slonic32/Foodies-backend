@@ -3,7 +3,8 @@ import {
     updateAvatar, getCurrentUserInfo, getFollowers,
     getFollowing,
     followUser,
-    unfollowUser
+    unfollowUser,
+    getUserInfo
 } from '../controllers/usersControllers.js';
 import { auth } from '../middlewares/authMiddleware.js';
 
@@ -15,6 +16,8 @@ usersRouter.patch('/avatar', auth, uploadImage, updateAvatar);
 
 // get current user
 usersRouter.get('/current', auth, getCurrentUserInfo);
+
+usersRouter.get('/:id', auth, getUserInfo);
 
 usersRouter.get('/followers', auth, getFollowers);
 usersRouter.get('/following', auth, getFollowing);

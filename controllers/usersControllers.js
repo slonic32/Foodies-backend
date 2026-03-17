@@ -3,7 +3,8 @@ import {
     removeFollower,
     getUserFollowers,
     getUserFollowing,
-    fetchCurrentUserInfo
+    fetchCurrentUserInfo,
+    fetchUserInfo
 } from '../services/usersServices.js';
 
 import { resizeImg } from '../services/imgServices.js';
@@ -30,6 +31,16 @@ export async function updateAvatar(req, res, next) {
 export async function getCurrentUserInfo(req, res, next) {
     try {
         const userInfo = await fetchCurrentUserInfo(req.user.id);
+
+        res.status(200).json(userInfo);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getUserInfo(req, res, next) {
+    try {
+        const userInfo = await fetchUserInfo(req.params.id);
 
         res.status(200).json(userInfo);
     } catch (error) {
