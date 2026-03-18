@@ -17,10 +17,9 @@ usersRouter.patch('/avatar', auth, uploadImage, updateAvatar);
 // get current user
 usersRouter.get('/current', auth, getCurrentUserInfo);
 
-usersRouter.get('/:id', auth, getUserInfo);
-
 usersRouter.get('/followers', auth, getFollowers);
 usersRouter.get('/following', auth, getFollowing);
+usersRouter.get('/:id', auth, getUserInfo);
 
 usersRouter.post('/follow/:id', auth, followUser);
 usersRouter.delete('/follow/:id', auth, unfollowUser);
