@@ -5,6 +5,7 @@ import { sequelize } from '../db/sequelize.js';
 import { Category } from '../db/models/categoriesModel.js';
 import { Area } from '../db/models/areasModel.js';
 import { RecipeIngredient } from '../db/models/recipeIngredientsModel.js';
+import { User } from '../db/models/usersModel.js';
 import HttpError from '../helpers/HttpError.js';
 import { UniqueConstraintError } from 'sequelize';
 
@@ -50,10 +51,44 @@ export const listRecipes = async ({ category, area, ingredient, page = 1, limit 
     };
 };
 
-export const getRecipeDetail = async (id) => {
-    const recipe = await Recipe.findByPk(id);
+export const getRecipeDetail = async (id, userId = null) => {
+    const recipe = await Recipe.findByPk(id, {
+        include: [
+            {
+                model: Category,
+                as: 'category',
+                attributes: ['id', 'name'],
+            },
+            {
+                model: Area,
+                as: 'area',
+                attributes: ['id', 'name'],
+            },
+            {
+                model: User,
+                as: 'owner',
+                attributes: ['id', 'name', 'avatar'],
+            },
+            {
+                model: Ingredient,
+                as: 'ingredients',
+                attributes: ['id', 'name', 'img'],
+                through: { model: RecipeIngredient, attributes: ['measure'] },
+            },
+        ],
+    });
+
     if (!recipe) throw HttpError(404, 'Recipe not found');
-    return recipe;
+
+    let isFavorite = false;
+    if (userId) {
+        const favorite = await Favorite.findOne({
+            where: { user_id: userId, recipe_id: id },
+        });
+        isFavorite = !!favorite;
+    }
+
+    return { ...recipe.toJSON(), isFavorite };
 };
 
 export const getPopularRecipes = async ({ page = 1, limit = 10 } = {}) => {
@@ -69,8 +104,9 @@ export const getPopularRecipes = async ({ page = 1, limit = 10 } = {}) => {
             { model: Favorite, as: 'favorites', attributes: [] },
             { model: Category, as: 'category', attributes: ['id', 'name'] },
             { model: Area, as: 'area', attributes: ['id', 'name'] },
+            { model: User, as: 'owner', attributes: ['id', 'name', 'avatar'] },
         ],
-        group: ['Recipe.id', 'category.id', 'area.id'],
+        group: ['Recipe.id', 'category.id', 'area.id', 'owner.id'],
         order: [[sequelize.literal('"favoritesCount"'), 'DESC']],
         limit,
         offset,

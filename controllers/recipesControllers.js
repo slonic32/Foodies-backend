@@ -71,7 +71,7 @@ export const getById = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid recipe id' });
         }
 
-        const recipe = await recipesService.getRecipeDetail(recipeId);
+        const recipe = await recipesService.getRecipeDetail(recipeId, req.user?.id ?? null);
 
         res.json({ data: recipe });
     } catch (error) {
