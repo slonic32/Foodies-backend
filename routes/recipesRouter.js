@@ -31,6 +31,108 @@ Swagger docs
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     RecipeOwner:
+ *       type: object
+ *       properties:
+ *         id: { type: integer, example: 3 }
+ *         name: { type: string, example: "John Doe" }
+ *         avatar: { type: string, nullable: true, example: "https://cdn.example.com/avatar.jpg" }
+ *
+ *     RecipeIngredientItem:
+ *       type: object
+ *       properties:
+ *         id: { type: integer, example: 12 }
+ *         name: { type: string, example: "Salt" }
+ *         img: { type: string, nullable: true, example: "https://cdn.example.com/salt.png" }
+ *         RecipeIngredient:
+ *           type: object
+ *           properties:
+ *             measure: { type: string, nullable: true, example: "1 tsp" }
+ *
+ *     RecipeSummary:
+ *       type: object
+ *       properties:
+ *         id: { type: integer, example: 1 }
+ *         title: { type: string, example: "Borsch" }
+ *         description: { type: string, nullable: true }
+ *         thumb: { type: string, nullable: true }
+ *         time: { type: integer, nullable: true, example: 90 }
+ *         category:
+ *           type: object
+ *           properties:
+ *             id: { type: integer }
+ *             name: { type: string, example: "Beef" }
+ *         area:
+ *           type: object
+ *           nullable: true
+ *           properties:
+ *             id: { type: integer }
+ *             name: { type: string, example: "Ukrainian" }
+ *         ingredients:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/RecipeIngredientItem'
+ *
+ *     RecipePopular:
+ *       allOf:
+ *         - $ref: '#/components/schemas/RecipeSummary'
+ *         - type: object
+ *           properties:
+ *             favoritesCount: { type: integer, example: 42 }
+ *             owner:
+ *               $ref: '#/components/schemas/RecipeOwner'
+ *
+ *     RecipeDetail:
+ *       allOf:
+ *         - $ref: '#/components/schemas/RecipeSummary'
+ *         - type: object
+ *           properties:
+ *             instructions: { type: string }
+ *             preview: { type: string, nullable: true }
+ *             owner:
+ *               $ref: '#/components/schemas/RecipeOwner'
+ *             isFavorite:
+ *               type: boolean
+ *               description: "True if the requesting user added this recipe to favorites. Always false for unauthenticated requests."
+ *               example: false
+ *
+ *     CreateRecipeBody:
+ *       type: object
+ *       required: [title, instructions, category_id]
+ *       properties:
+ *         title: { type: string, minLength: 2, maxLength: 150, example: "Borsch" }
+ *         description: { type: string }
+ *         instructions: { type: string }
+ *         thumb: { type: string }
+ *         time: { type: integer, minimum: 1, example: 90 }
+ *         category_id: { type: integer, example: 2 }
+ *         area_id: { type: integer, example: 5 }
+ *         ingredients:
+ *           type: array
+ *           items: { type: integer }
+ *           example: [12, 34, 56]
+ *
+ *     PaginationMeta:
+ *       type: object
+ *       properties:
+ *         total: { type: integer, example: 120 }
+ *         page: { type: integer, example: 1 }
+ *         limit: { type: integer, example: 10 }
+ *         totalPages: { type: integer, example: 12 }
+ *
+ *     PaginationMetaWithNav:
+ *       allOf:
+ *         - $ref: '#/components/schemas/PaginationMeta'
+ *         - type: object
+ *           properties:
+ *             hasNextPage: { type: boolean, example: true }
+ *             hasPreviousPage: { type: boolean, example: false }
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Recipes
  *   description: Recipes management
@@ -153,7 +255,7 @@ Swagger docs
  *                       items:
  *                         $ref: '#/components/schemas/RecipeSummary'
  *                     meta:
- *                       $ref: '#/components/schemas/Meta'
+ *                       $ref: '#/components/schemas/PaginationMeta'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  */
@@ -168,6 +270,7 @@ Swagger docs
  *     description: >
  *       Popularity = COUNT(favorites.recipe_id) per recipe.
  *       Recipes with the most favorites appear first.
+ *       Each item includes owner (id, name, avatar) and favoritesCount.
  *       page and limit are parsed manually in the controller (not validated by schema).
  *     tags: [Recipes]
  *     parameters:
@@ -200,7 +303,7 @@ Swagger docs
  *                       items:
  *                         $ref: '#/components/schemas/RecipePopular'
  *                     meta:
- *                       $ref: '#/components/schemas/MetaWithNav'
+ *                       $ref: '#/components/schemas/PaginationMetaWithNav'
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -246,7 +349,7 @@ Swagger docs
  *                       items:
  *                         $ref: '#/components/schemas/RecipeSummary'
  *                     meta:
- *                       $ref: '#/components/schemas/Meta'
+ *                       $ref: '#/components/schemas/PaginationMeta'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -294,7 +397,7 @@ Swagger docs
  *                       items:
  *                         $ref: '#/components/schemas/RecipeSummary'
  *                     meta:
- *                       $ref: '#/components/schemas/Meta'
+ *                       $ref: '#/components/schemas/PaginationMeta'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -308,8 +411,13 @@ Swagger docs
  *     summary: Get recipe detail by ID
  *     description: >
  *       Returns a single recipe by integer primary key.
+ *       Includes category, area, owner (id, name, avatar) and ingredients with measure.
+ *       isFavorite is true only when the request is authenticated and the recipe is in the user's favorites.
  *       Throws 404 if the recipe does not exist.
  *     tags: [Recipes]
+ *     security:
+ *       - {}
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -320,7 +428,7 @@ Swagger docs
  *           example: 1
  *     responses:
  *       200:
- *         description: Recipe detail
+ *         description: Full recipe detail
  *         content:
  *           application/json:
  *             schema:
