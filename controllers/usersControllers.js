@@ -1,27 +1,28 @@
 import {
-    changeAvatar, addFollower,
+    changeAvatar,
+    addFollower,
     removeFollower,
     getUserFollowers,
     getUserFollowing,
     fetchCurrentUserInfo,
-    fetchUserInfo
+    fetchUserInfo,
 } from '../services/usersServices.js';
 
 import { resizeImg } from '../services/imgServices.js';
 
-
-
 export async function updateAvatar(req, res, next) {
     try {
-        if (req.file) {
-            const avatar = await resizeImg(req.file);
-            const user = await changeAvatar(req.user.id, avatar);
-            return res.status(200).json({
-                avatar: user.avatar,
+        if (!req.file) {
+            return res.status(400).json({
+                message: 'Avatar file is required',
             });
         }
-        return res.status(401).json({
-            message: 'Not authorized',
+
+        const avatar = await resizeImg(req.file);
+        const user = await changeAvatar(req.user.id, avatar);
+
+        return res.status(200).json({
+            avatar: user.avatar,
         });
     } catch (error) {
         next(error);
@@ -97,5 +98,3 @@ export async function getFollowing(req, res, next) {
         next(error);
     }
 }
-
-
