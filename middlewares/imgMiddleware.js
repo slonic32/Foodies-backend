@@ -23,7 +23,7 @@ function fileFilter(req, file, cb) {
 }
 
 const fileLimits = {
-    fieldSize: 1000000,
+    fieldSize: 1024 * 1024 * 2,
 };
 
 export const uploadImage = multer({
