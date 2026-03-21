@@ -1,9 +1,4 @@
-import {
-    createUser,
-    getUserByEmail,
-    loginUserService,
-    logoutUserService,
-} from '../services/authServices.js';
+import { createUser, getUserByEmail, loginUserService, logoutUserService } from '../services/authServices.js';
 
 export async function registerUser(req, res, next) {
     try {
@@ -32,6 +27,7 @@ export async function loginUser(req, res, next) {
         res.status(200).json({
             token: user.token,
             user: {
+                id: user.id,
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
