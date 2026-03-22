@@ -115,8 +115,47 @@ export const getFavorites = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
     try {
-        const recipe = await recipesService.createRecipe(req.user.id, req.body);
-
+        const { title, description, instructions, time, category_id, area_id, ingredients } = req.body;
+ 
+        // Validate required fields
+        if (!title || !title.trim()) {
+            throw HttpError(400, 'title is required');
+        }
+        if (!instructions || !instructions.trim()) {
+            throw HttpError(400, 'instructions is required');
+        }
+        if (!category_id) {
+            throw HttpError(400, 'category_id is required');
+        }
+ 
+        // Parse numeric fields
+        const recipeData = {
+            title: title.trim(),
+            description: description ? description.trim() : null,
+            instructions: instructions.trim(),
+            time: time ? Number(time) : null,
+            category_id: Number(category_id),
+            area_id: area_id ? Number(area_id) : null,
+        };
+ 
+        // Parse ingredients from JSON string
+        let parsedIngredients = [];
+        if (ingredients) {
+            try {
+                parsedIngredients = JSON.parse(ingredients);
+            } catch {
+                throw HttpError(400, 'ingredients must be a valid JSON array');
+            }
+        }
+ 
+        // Create recipe with image file and ingredients
+        const recipe = await recipesService.createRecipe(
+            req.user.id,
+            recipeData,
+            req.file || null,
+            parsedIngredients
+        );
+ 
         res.status(201).json({ data: recipe });
     } catch (error) {
         next(error);
