@@ -1,3 +1,4 @@
+import HttpError from '../helpers/HttpError.js';
 import * as recipesService from '../services/recipesServices.js';
 
 const parsePage = (value, defaultValue = 1) => {
