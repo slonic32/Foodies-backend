@@ -8,6 +8,7 @@ import { RecipeIngredient } from '../db/models/recipeIngredientsModel.js';
 import { User } from '../db/models/usersModel.js';
 import HttpError from '../helpers/HttpError.js';
 import { UniqueConstraintError } from 'sequelize';
+import cloudinary from '../helpers/cloudinary.js';
 
 export const listRecipes = async ({ category, area, ingredient, page = 1, limit = 10 }) => {
     const offset = (page - 1) * limit;
@@ -179,8 +180,41 @@ export const getUserFavoriteRecipes = async ({ user_id, page, limit }) => {
     };
 };
 
-export const createRecipe = async (userId, data) => {
-    return await Recipe.create({ ...data, owner_id: userId });
+export const createRecipe = async (userId, data, file = null, ingredients = []) => {
+    let thumbUrl = null;
+ 
+    if (file) {
+        try {
+            const result = await cloudinary.uploader.upload(file.path, {
+                folder: 'foodies/recipes',
+                resource_type: 'image',
+            });
+            thumbUrl = result.secure_url;
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            throw HttpError(500, 'Error uploading recipe image');
+        } finally {
+            await fse.remove(file.path).catch(() => {});
+        }
+    }
+ 
+    const recipe = await Recipe.create({
+        ...data,
+        thumb: thumbUrl,
+        owner_id: userId,
+    });
+ 
+    if (ingredients.length > 0) {
+        const ingredientRecords = ingredients.map((ing) => ({
+            recipe_id: recipe.id,
+            ingredient_id: Number(ing.id),
+            measure: ing.measure || null,
+        }));
+ 
+        await RecipeIngredient.bulkCreate(ingredientRecords);
+    }
+ 
+    return getRecipeDetail(recipe.id, userId);
 };
 
 export const addRecipeToFavorites = async (userId, recipeId) => {

@@ -1,8 +1,9 @@
 import express from 'express';
 import { auth } from '../middlewares/authMiddleware.js';
 import { validateBody } from '../middlewares/validateBody.js';
-import { createRecipeSchema, searchRecipesSchema } from '../schemas/recipesSchemas.js';
+import { searchRecipesSchema } from '../schemas/recipesSchemas.js';
 import * as recipeController from '../controllers/recipesControllers.js';
+import { uploadRecipeImage } from '../middlewares/imgMiddleware.js';
 
 const recipesRouter = express.Router();
 
@@ -15,7 +16,7 @@ recipesRouter.get('/favorites', auth, recipeController.getFavorites);
 
 recipesRouter.get('/:id', recipeController.getById);
 
-recipesRouter.post('/', auth, validateBody(createRecipeSchema), recipeController.create);
+recipesRouter.post('/', auth, uploadRecipeImage, recipeController.create);
 recipesRouter.post('/:id/favorite', auth, recipeController.addToFavorites);
 recipesRouter.delete('/:id/favorite', auth, recipeController.removeFromFavorites);
 

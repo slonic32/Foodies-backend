@@ -31,3 +31,10 @@ export const uploadImage = multer({
     fileFilter: fileFilter,
     limits: fileLimits,
 }).single('avatar');
+
+
+export const uploadRecipeImage = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: fileLimits,
+}).single('thumb');
