@@ -9,6 +9,7 @@ import { User } from '../db/models/usersModel.js';
 import HttpError from '../helpers/HttpError.js';
 import { UniqueConstraintError } from 'sequelize';
 import cloudinary from '../helpers/cloudinary.js';
+import * as fse from 'fs-extra';
 
 export const listRecipes = async ({ category, area, ingredient, page = 1, limit = 10 }) => {
     const offset = (page - 1) * limit;
