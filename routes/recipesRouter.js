@@ -13,6 +13,7 @@ recipesRouter.get('/popular', recipeController.getPopular);
 
 recipesRouter.get('/own', auth, recipeController.getOwn);
 recipesRouter.get('/favorites', auth, recipeController.getFavorites);
+recipesRouter.get('/user/:id', auth, recipeController.getUserRecipes);
 
 recipesRouter.get('/:id', recipeController.getById);
 

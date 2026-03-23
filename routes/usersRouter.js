@@ -1,10 +1,13 @@
 import express from 'express';
 import {
-    updateAvatar, getCurrentUserInfo, getFollowers,
-    getFollowing,
+    updateAvatar,
+    getCurrentUserInfo,
+    getUserInfo,
     followUser,
     unfollowUser,
-    getUserInfo
+    getFollowers,
+    getFollowing,
+    getFollowersById,
 } from '../controllers/usersControllers.js';
 import { auth } from '../middlewares/authMiddleware.js';
 
@@ -19,6 +22,7 @@ usersRouter.get('/current', auth, getCurrentUserInfo);
 
 usersRouter.get('/followers', auth, getFollowers);
 usersRouter.get('/following', auth, getFollowing);
+usersRouter.get('/:id/followers', auth, getFollowersById);
 usersRouter.get('/:id', auth, getUserInfo);
 
 usersRouter.post('/follow/:id', auth, followUser);
