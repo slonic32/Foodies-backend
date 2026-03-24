@@ -27,6 +27,10 @@ export async function createUser(userName, userEmail, userPassword) {
             password: userPassword,
             avatar: avatar,
         });
+
+        const token = genToken(newUser.id);
+
+        await newUser.update({ token });
         return newUser;
     } catch (error) {
         throw HttpError(500);

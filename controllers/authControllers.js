@@ -11,9 +11,13 @@ export async function registerUser(req, res, next) {
         const newUser = await createUser(name, email, password);
 
         return res.status(201).json({
-            name: newUser.name,
-            email: newUser.email,
-            avatar: newUser.avatar,
+            token: newUser.token,
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                avatar: newUser.avatar,
+            },
         });
     } catch (error) {
         next(error);
