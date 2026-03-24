@@ -117,7 +117,7 @@ export const getFavorites = async (req, res, next) => {
 export const create = async (req, res, next) => {
     try {
         const { title, description, instructions, time, category_id, area_id, ingredients } = req.body;
- 
+
         // Validate required fields
         if (!title || !title.trim()) {
             throw HttpError(400, 'title is required');
@@ -128,7 +128,7 @@ export const create = async (req, res, next) => {
         if (!category_id) {
             throw HttpError(400, 'category_id is required');
         }
- 
+
         // Parse numeric fields
         const recipeData = {
             title: title.trim(),
@@ -138,7 +138,7 @@ export const create = async (req, res, next) => {
             category_id: Number(category_id),
             area_id: area_id ? Number(area_id) : null,
         };
- 
+
         // Parse ingredients from JSON string
         let parsedIngredients = [];
         if (ingredients) {
@@ -148,15 +148,10 @@ export const create = async (req, res, next) => {
                 throw HttpError(400, 'ingredients must be a valid JSON array');
             }
         }
- 
+
         // Create recipe with image file and ingredients
-        const recipe = await recipesService.createRecipe(
-            req.user.id,
-            recipeData,
-            req.file || null,
-            parsedIngredients
-        );
- 
+        const recipe = await recipesService.createRecipe(req.user.id, recipeData, req.file || null, parsedIngredients);
+
         res.status(201).json({ data: recipe });
     } catch (error) {
         next(error);
@@ -203,6 +198,23 @@ export const remove = async (req, res, next) => {
         await recipesService.deleteRecipe(req.user.id, recipeId);
 
         res.status(204).send();
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getUserRecipes = async (req, res, next) => {
+    try {
+        const page = parsePage(req.query.page, 1);
+        const limit = parseLimit(req.query.limit, 10, 50);
+
+        const { recipes, meta } = await recipesService.getUserRecipes({
+            owner_id: req.params.id,
+            page,
+            limit,
+        });
+
+        res.json({ data: { recipes, meta } });
     } catch (error) {
         next(error);
     }

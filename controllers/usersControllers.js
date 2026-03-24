@@ -98,3 +98,12 @@ export async function getFollowing(req, res, next) {
         next(error);
     }
 }
+
+export async function getFollowersById(req, res, next) {
+    try {
+        const followers = await getUserFollowers(req.params.id);
+        res.status(200).json(followers);
+    } catch (error) {
+        next(error);
+    }
+}
