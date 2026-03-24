@@ -35,6 +35,7 @@ export const listRecipes = async ({ category, area, ingredient, page = 1, limit 
             ingredientInclude,
             { model: Category, as: 'category', attributes: ['id', 'name'] },
             { model: Area, as: 'area', attributes: ['id', 'name'] },
+            { model: User, as: 'owner', attributes: ['id', 'name', 'avatar'] },
         ],
         order: [['createdAt', 'DESC']],
         limit,
@@ -183,7 +184,7 @@ export const getUserFavoriteRecipes = async ({ user_id, page, limit }) => {
 
 export const createRecipe = async (userId, data, file = null, ingredients = []) => {
     let thumbUrl = null;
- 
+
     if (file) {
         try {
             const result = await cloudinary.uploader.upload(file.path, {
@@ -198,23 +199,23 @@ export const createRecipe = async (userId, data, file = null, ingredients = []) 
             await fse.remove(file.path).catch(() => {});
         }
     }
- 
+
     const recipe = await Recipe.create({
         ...data,
         thumb: thumbUrl,
         owner_id: userId,
     });
- 
+
     if (ingredients.length > 0) {
         const ingredientRecords = ingredients.map((ing) => ({
             recipe_id: recipe.id,
             ingredient_id: Number(ing.id),
             measure: ing.measure || null,
         }));
- 
+
         await RecipeIngredient.bulkCreate(ingredientRecords);
     }
- 
+
     return getRecipeDetail(recipe.id, userId);
 };
 
