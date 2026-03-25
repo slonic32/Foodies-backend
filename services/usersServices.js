@@ -4,6 +4,32 @@ import { Subscription } from '../db/models/subscriptionsModel.js';
 import { Recipe } from '../db/models/recipesModel.js';
 import { Favorite } from '../db/models/favoritesModel.js';
 
+async function enrichUserWithRecipes(user) {
+    const recipes = await Recipe.findAll({
+        where: { owner_id: user.id },
+        attributes: ['id', 'title', 'thumb'],
+        order: [['createdAt', 'DESC']],
+        limit: 4,
+    });
+
+    const recipesCount = await Recipe.count({
+        where: { owner_id: user.id },
+    });
+
+    return {
+        id: user.id,
+        avatar: user.avatar,
+        name: user.name,
+        email: user.email,
+        recipesCount,
+        recipesPreview: recipes.map((recipe) => ({
+            id: recipe.id,
+            title: recipe.title,
+            thumb: recipe.thumb,
+        })),
+    };
+}
+
 export async function changeAvatar(id, avatar) {
     try {
         const user = await User.findByPk(id);
@@ -153,7 +179,11 @@ export async function getUserFollowers(userId) {
 
         if (!user) throw HttpError(404, 'User not found');
 
-        return user.followers;
+        const followersWithRecipes = await Promise.all(
+            user.followers.map((follower) => enrichUserWithRecipes(follower)),
+        );
+
+        return followersWithRecipes;
     } catch (error) {
         if (error.status) throw error;
         throw HttpError(500, 'Error fetching followers');
@@ -175,7 +205,11 @@ export async function getUserFollowing(userId) {
 
         if (!user) throw HttpError(404, 'User not found');
 
-        return user.followings;
+        const followingsWithRecipes = await Promise.all(
+            user.followings.map((following) => enrichUserWithRecipes(following)),
+        );
+
+        return followingsWithRecipes;
     } catch (error) {
         if (error.status) throw error;
         throw HttpError(500, 'Error fetching following list');
